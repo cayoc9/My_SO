@@ -1,0 +1,71 @@
+#cloud-config
+autoinstall:
+  version: 1
+
+  # Configuração do usuário e do sistema
+  identity:
+    realname: "Seu Nome Completo"
+    hostname: ubuntu-desktop
+    username: seu_usuario
+    password: "<password hash>"
+
+  locale: pt_BR.UTF-8
+  keyboard:
+    layout: br
+  timezone: "America/Sao_Paulo"
+
+  # Instalação via APT (pacotes oficiais)
+  packages:
+    - docker.io
+    - docker-compose-plugin
+    - git
+    - gh            # GitHub CLI (para operações com GitHub)
+    - pgadmin4
+
+  # Instalação via Snap
+  snaps:
+    - name: code        # VSCode oficial (modo classic)
+      classic: true
+    - name: multipass   # Ferramenta de VMs da Canonical
+    - name: gear-level  # Placeholder para "Gear Level" (requer FUSE); ajuste conforme necessário
+    - name: postman
+    - name: insomnia
+    - name: bitwarden
+    - name: obsidian
+    - name: telegram-desktop
+    - name: brave-browser
+
+  # Layout de armazenamento: neste exemplo, particionamento simples (direct)
+  storage:
+    layout:
+      name: direct
+
+  # Comandos executados logo após o início da instalação
+  early-commands:
+    - echo 'linux-generic-hwe-22.04' > /run/kernel-meta-package
+
+  # Comandos executados ao final da instalação (no sistema instalado)
+  late-commands:
+    # Instalar TeamViewer (via .deb)
+    - >
+      curtin in-target -- wget -O /tmp/teamviewer.deb https://download.teamviewer.com/download/linux/teamviewer_amd64.deb
+    - >
+      curtin in-target -- apt-get install -y /tmp/teamviewer.deb
+
+    # Instalar Google Chrome (via .deb)
+    - >
+      curtin in-target -- wget -O /tmp/google-chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+    - >
+      curtin in-target -- apt-get install -y /tmp/google-chrome.deb
+
+    # Instalar Cursor IA (AppImage)
+    - >
+      curtin in-target -- wget -O /opt/CursorIA.AppImage https://example.com/CursorIA.AppImage
+    - >
+      curtin in-target -- chmod +x /opt/CursorIA.AppImage
+
+    # Instalar Ollama (via .deb; substitua a URL pelo link oficial)
+    - >
+      curtin in-target -- wget -O /tmp/ollama.deb https://ollama.com/download/ollama_latest_amd64.deb
+    - >
+      curtin in-target -- apt-get install -y /tmp/ollama.deb
